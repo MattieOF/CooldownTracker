@@ -87,6 +87,7 @@ namespace CooldownTracker
             {
                 Console.WriteLine("Socket connected!");
                 Console.WriteLine("Commands: clearimages, toggleimage, togglelogging, reloadexemptions, clearexemptions, exemptions, addexemption, removeexemption, setmincost, exit");
+                Console.WriteLine("Exemptions are redemption names that will show up even if their cost is below the minimum cost.");
             };
 
             socket.On(config.streamerName, response =>
