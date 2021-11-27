@@ -24,7 +24,7 @@ namespace CooldownTracker
         public static Config LoadConfig(string path = "Config/config.cfg")
         {
             if (!File.Exists(path))
-                return CreateDefaultConfig();
+                return CreateDefaultConfig(path);
 
             string serialisedConfig = File.ReadAllText(path);
 
