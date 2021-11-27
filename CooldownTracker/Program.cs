@@ -68,7 +68,7 @@ namespace CooldownTracker
             LoadExemptions();
 
             // Connect to socket
-            Console.WriteLine("Connecting...");
+            Console.WriteLine($"Connecting to socket {config.apiURL}...");
             var uri = new Uri(config.apiURL);
             var socket = new SocketIO(uri, new SocketIOOptions
             {
