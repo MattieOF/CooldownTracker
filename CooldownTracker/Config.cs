@@ -6,13 +6,14 @@ namespace CooldownTracker
 {
     public class Config
     {
-        public string streamerName;
+        public string streamerName, apiURL;
         public uint minCost;
         public bool showImageInNotification;
 
         public Config()
         {
             streamerName = "usteppin";
+            apiURL = "http://rewards-relay.herokuapp.com/";
             minCost = 200;
             showImageInNotification = true;
         }

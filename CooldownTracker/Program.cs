@@ -69,7 +69,7 @@ namespace CooldownTracker
 
             // Connect to socket
             Console.WriteLine("Connecting...");
-            var uri = new Uri("http://rewards-relay.herokuapp.com/");
+            var uri = new Uri(config.apiURL);
             var socket = new SocketIO(uri, new SocketIOOptions
             {
                 Reconnection = true,
