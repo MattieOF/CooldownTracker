@@ -37,7 +37,7 @@ namespace CooldownTracker
             return delay;
         }
 
-        public double NextDealy()
+        public double NextDealy() // This typo is hard coded into the interface...
         {
             return delay += 1000;
         }
