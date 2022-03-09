@@ -147,6 +147,12 @@ namespace CooldownTracker
                 return;
             }
 
+            if (input.Equals("clear", StringComparison.CurrentCultureIgnoreCase))
+            {
+                Console.Clear();
+                return;
+            }
+
             if (input.Equals("togglelogging", StringComparison.CurrentCultureIgnoreCase)
                 || input.Equals("togglelog", StringComparison.CurrentCultureIgnoreCase)
                 || input.Equals("togglelogs", StringComparison.CurrentCultureIgnoreCase))
