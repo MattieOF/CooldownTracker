@@ -206,6 +206,12 @@ namespace CooldownTracker
 
             if (tokens[0].Equals("removeexemption", StringComparison.CurrentCultureIgnoreCase))
             {
+                if (tokens.Length <= 1)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Provide an exemption to remove as an argument");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
                 RemoveExemption(tokens[1]);
                 return;
             }
