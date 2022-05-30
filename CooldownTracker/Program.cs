@@ -45,14 +45,14 @@ namespace CooldownTracker
 
     class Program
     {
-        public static List<Redemption> redemptions    = new List<Redemption>();
-        public static List<string>     exemptions     = new List<string>();
-        public static WebClient        client         = new WebClient();
-        public static CultureInfo      culture        = CultureInfo.CreateSpecificCulture("en-US");
-        public static bool             enumerating    = false;
-        public static bool             logRedemptions = true;
+        private static List<Redemption> redemptions    = new List<Redemption>();
+        private static List<string>     exemptions     = new List<string>();
+        private static WebClient        client         = new WebClient();
+        private static CultureInfo      culture        = CultureInfo.CreateSpecificCulture("en-US");
+        private static bool             enumerating    = false;
+        private static bool             logRedemptions = true;
 
-        public static Config           config;
+        private static Config           config;
 
         static async Task Main(string[] args)
         {
@@ -86,7 +86,7 @@ namespace CooldownTracker
             socket.OnConnected += (sender, e) =>
             {
                 Console.WriteLine("Socket connected!");
-                Console.WriteLine("Commands: clearimages, toggleimage, togglelogging, reloadexemptions, clearexemptions, exemptions, addexemption, removeexemption, setmincost, exit");
+                Console.WriteLine("Commands: cooldowns, clearimages, toggleimage, togglelogging, reloadexemptions, clearexemptions, exemptions, addexemption, removeexemption, mincost, setmincost, clear, exit");
                 Console.WriteLine("Exemptions are redemption names that will show up even if their cost is below the minimum cost.");
             };
 
@@ -131,6 +131,9 @@ namespace CooldownTracker
             string input;
             do
             {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("> ");
+                Console.ForegroundColor = ConsoleColor.White;
                 input = Console.ReadLine();
                 ProcessInput(input);
             }
@@ -185,6 +188,21 @@ namespace CooldownTracker
             if (input.Equals("clearexemptions", StringComparison.CurrentCultureIgnoreCase))
             {
                 ClearExemptions();
+                return;
+            }
+            
+            if (input.Equals("cooldowns", StringComparison.CurrentCultureIgnoreCase))
+            {
+                PrintCurrentCooldowns();
+                return;
+            }
+            
+            if (input.Equals("mincost", StringComparison.CurrentCultureIgnoreCase))
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Minimum cost is currently ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(config.minCost);
                 return;
             }
 
@@ -299,12 +317,19 @@ namespace CooldownTracker
 
         public static void ClearExemptions()
         {
+            // Save the old exemptions and get the count
             SaveExemptions("Config/exemptions.old.txt");
             int oldCount = exemptions.Count;
+            
+            // Clear the exemptions and save it (pretty much, reset the file)
             exemptions.Clear();
             SaveExemptions();
+            
+            // Feedback to user
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Cleared {oldCount} exemptions!");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine($"Old exemptions have been saved to Config/exemptions.old.txt");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -321,6 +346,7 @@ namespace CooldownTracker
             int count = 0;
             foreach (string file in Directory.GetFiles("Images"))
             {
+                // Only delete if its an image file 
                 if (Path.GetExtension(file) == ".png")
                 {
                     File.Delete(file);
@@ -333,6 +359,23 @@ namespace CooldownTracker
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        public static void PrintCurrentCooldowns()
+        {
+            Console.WriteLine("Redemptions currently on cooldown are:");
+            
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            foreach (Redemption r in redemptions)
+            {
+                if (!r.ready)
+                {
+                    // It's on cooldown
+                    var cooldown = r.cooldownExpiresAt - DateTime.Now;
+                    Console.WriteLine($"{r.name}: {cooldown.Hours:D2}:{cooldown.Minutes:D2}:{cooldown.Seconds:D2}");
+                }
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        
         /// <summary>
         /// Enumerate through all redemptions in the list and check if they are ready yet.
         /// The parameters are not needed.
@@ -340,7 +383,7 @@ namespace CooldownTracker
         public static void CheckRedemptions(object sender, ElapsedEventArgs e)
         {
             // The 'enumerating' bool is a bodged solution to a collection 
-            // modified exception if a redemption is recieved during the foreach
+            // modified exception if a redemption is received during the foreach
             enumerating = true;
             foreach (Redemption r in redemptions)
             {
